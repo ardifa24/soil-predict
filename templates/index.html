@@ -16,7 +16,6 @@
             align-items: center;
         }
 
-        /* Container Styles */
         .container {
             background: #ffffff;
             border-radius: 10px;
@@ -28,7 +27,6 @@
             margin: 20px 0;
         }
 
-        /* Header Styles */
         h1 {
             font-size: 2.2em;
             color: #2a9d8f;
@@ -41,7 +39,6 @@
             margin-bottom: 20px;
         }
 
-        /* Form Styles */
         form {
             display: flex;
             flex-direction: column;
@@ -80,7 +77,6 @@
             background-color: #21867a;
         }
 
-        /* Result Section Styles */
         .result {
             font-size: 1.5em;
             margin: 20px 0;
@@ -91,20 +87,6 @@
             border: 1px solid #2a9d8f;
             display: inline-block;
         }
-
-        /* Scroll Button Styles */
-        button {
-            transition: background-color 0.3s, transform 0.2s;
-        }
-
-        button:hover {
-            transform: scale(1.05);
-        }
-
-        img {
-            max-width: 70%; 
-            height: auto; 
-        }
     </style>
 </head>
 
@@ -113,54 +95,33 @@
     <div class="container">
         <h1>Prediksi Jenis Tanah</h1>
         <h2>Unggah Gambar Tanah Anda</h2>
-        <form action="/submit" method="post" enctype="multipart/form-data" id="uploadForm">
+        <form action="/predict" method="post" enctype="multipart/form-data">
             <label for="file">Pilih gambar:</label>
-            <input type="file" name="image" id="file" required>
-            <div id="previewArea">
-                <p id="message">Belum ada file</p>
-            </div>
-            <button type="submit" id="submitButton">Prediksi</button>
+            <input type="file" name="file" id="file" required>
+            <button type="submit">Prediksi</button>
         </form>
     </div>
 
     <!-- Result Section -->
-    <div class="container" id="result-section">
+    {% if predicted_class and probability %}
+    <div class="container">
         <h1>Hasil Prediksi</h1>
-        {% if prediction %}
-        <p>Gambar yang Anda unggah telah berhasil diprediksi.</p>
-        <img src="{{ url_for('static', filename=img_path.split('/')[-1]) }}" alt="">
-        <p class="result">Hasil: <span>{{ prediction }}</span></p>
-        {% endif %}
-        <button onclick="scrollToTop()">Kembali ke atas</button>
+        <p>Jenis Tanah: <strong>{{ predicted_class }}</strong></p>
+        <p>Kepercayaan: <strong>{{ probability | round(2) }}%</strong></p>
     </div>
+    {% endif %}
 
     <script>
         const fileInput = document.getElementById('file');
-        const previewArea = document.getElementById('previewArea');
-        const submitButton = document.getElementById('submitButton');
-        const message = document.getElementById('message');
         const allowedTypes = ['image/png', 'image/jpeg', 'image/jpg'];
 
-        fileInput.addEventListener("change", (event) => {
+        fileInput.addEventListener('change', (event) => {
             const file = event.target.files[0];
-
-            if (file) {
-                if (!allowedTypes.includes(file.type)) {
-                    message.textContent = "Format file tidak didukung. Gunakan PNG atau JPEG.";
-                    submitButton.disabled = true;
-                } else {
-                    message.textContent = `File terpilih: ${file.name}`;
-                    submitButton.disabled = false;
-                }
-            } else {
-                message.textContent = "Belum ada file";
-                submitButton.disabled = true;
+            if (file && !allowedTypes.includes(file.type)) {
+                alert('Format file tidak didukung. Gunakan PNG atau JPEG.');
+                fileInput.value = ''; // Clear the input
             }
         });
-
-        function scrollToTop() {
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
     </script>
 </body>
 </html>
