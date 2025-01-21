@@ -132,25 +132,42 @@
         }
 
         // Simulate prediction result
-        document.getElementById('uploadForm').addEventListener('submit', function(event) {
-            event.preventDefault(); // Prevent actual submission
+        document.getElementById('uploadForm').addEventListener('submit', async function (event) {
+            event.preventDefault();
 
+           const formData = new FormData();
             const file = fileInput.files[0];
-            if (file) {
-                // Display result section
-                resultSection.style.display = 'block';
+            formData.append('file', file);
 
-                // Simulate prediction result
-                predictedClassSpan.textContent = 'Humus';
-                probabilitySpan.textContent = '85.5';
-                
-                // Display uploaded image
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    uploadedImage.src = e.target.result;
-                };
-                reader.readAsDataURL(file);
-            }
+             try {
+                 const response = await fetch('/predict', {
+                     method: 'POST',
+                     body: formData,
+                 });
+
+                 if (!response.ok) {
+                     throw new Error('Gagal memproses prediksi.');
+                 }
+
+                 const data = await response.json();
+                 if (data.error) {
+                     alert(data.error);
+                 } else {
+                     resultSection.style.display = 'block';
+                     predictedClassSpan.textContent = data.predicted_class;
+                     probabilitySpan.textContent = `${data.probability}%`;
+
+                     // Display uploaded image
+                     const reader = new FileReader();
+                     reader.onload = function (e) {
+                         uploadedImage.src = e.target.result;
+                     };
+                     reader.readAsDataURL(file);
+                }
+             } catch (error) {
+                 console.error(error);
+                 alert('Terjadi kesalahan saat memproses prediksi.');
+             }
         });
     </script>
 </body>
