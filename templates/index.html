@@ -78,7 +78,7 @@
         }
 
         .result {
-            font-size: 1.5em;
+            font-size: 1.1em;
             margin: 20px 0;
             color: #264653;
             background: #e9f5f4;
@@ -86,40 +86,70 @@
             border-radius: 8px;
             border: 1px solid #2a9d8f;
             display: inline-block;
+            text-align: left;
+            width: 100%;
+        }
+
+        img {
+            max-width: 100%; 
+            height: auto; 
+            margin-top: 10px;
         }
     </style>
 </head>
-
 <body>
-    <!-- Home Section -->
+    <!-- Input Section -->
     <div class="container">
         <h1>Prediksi Jenis Tanah</h1>
         <h2>Unggah Gambar Tanah Anda</h2>
-        <form action="/predict" method="post" enctype="multipart/form-data">
+        <form action="/predict" method="post" enctype="multipart/form-data" id="uploadForm">
             <label for="file">Pilih gambar:</label>
             <input type="file" name="file" id="file" required>
-            <button type="submit">Prediksi</button>
+            <button type="submit" id="submitButton">Prediksi</button>
         </form>
     </div>
 
-    <!-- Result Section -->
-    {% if predicted_class and probability %}
-    <div class="container">
+    <!-- Output Section -->
+    <div class="container" id="result-section" style="display: none;">
         <h1>Hasil Prediksi</h1>
-        <p>Jenis Tanah: <strong>{{ predicted_class }}</strong></p>
-        <p>Kepercayaan: <strong>{{ probability | round(2) }}%</strong></p>
+        <div class="result">
+            <p><strong>Jenis Tanah:</strong> <span id="predictedClass"></span></p>
+            <p><strong>Probabilitas:</strong> <span id="probability"></span>%</p>
+        </div>
+        <img id="uploadedImage" src="#" alt="Gambar Tanah">
+        <button onclick="scrollToTop()">Kembali ke atas</button>
     </div>
-    {% endif %}
 
     <script>
         const fileInput = document.getElementById('file');
-        const allowedTypes = ['image/png', 'image/jpeg', 'image/jpg'];
+        const resultSection = document.getElementById('result-section');
+        const predictedClassSpan = document.getElementById('predictedClass');
+        const probabilitySpan = document.getElementById('probability');
+        const uploadedImage = document.getElementById('uploadedImage');
 
-        fileInput.addEventListener('change', (event) => {
-            const file = event.target.files[0];
-            if (file && !allowedTypes.includes(file.type)) {
-                alert('Format file tidak didukung. Gunakan PNG atau JPEG.');
-                fileInput.value = ''; // Clear the input
+        function scrollToTop() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Simulate prediction result
+        document.getElementById('uploadForm').addEventListener('submit', function(event) {
+            event.preventDefault(); // Prevent actual submission
+
+            const file = fileInput.files[0];
+            if (file) {
+                // Display result section
+                resultSection.style.display = 'block';
+
+                // Simulate prediction result
+                predictedClassSpan.textContent = 'Humus';
+                probabilitySpan.textContent = '85.5';
+                
+                // Display uploaded image
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    uploadedImage.src = e.target.result;
+                };
+                reader.readAsDataURL(file);
             }
         });
     </script>
