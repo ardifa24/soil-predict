@@ -6,168 +6,145 @@
     <title>Prediksi Jenis Tanah</title>
     <style>
         body {
-            font-family: 'Arial', sans-serif;
+            font-family: Arial, sans-serif;
             margin: 0;
             padding: 0;
-            background-color: #f5f7fa;
-            color: #333;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+            background-color: #f8f9fa;
         }
 
         .container {
-            background: #ffffff;
-            border-radius: 10px;
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-            padding: 30px;
-            max-width: 500px;
-            width: 90%;
+            max-width: 600px;
+            margin: 50px auto;
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 20px;
             text-align: center;
-            margin: 20px 0;
         }
 
         h1 {
-            font-size: 2.2em;
-            color: #2a9d8f;
-            margin-bottom: 10px;
-        }
-
-        h2 {
-            font-size: 1.3em;
-            color: #264653;
-            margin-bottom: 20px;
-        }
-
-        form {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        label {
-            font-size: 1em;
-            color: #333;
-            margin-bottom: 10px;
+            color: #00796b;
         }
 
         input[type="file"] {
-            border: 1px solid #ccc;
+            margin: 20px 0;
             padding: 10px;
-            border-radius: 5px;
-            margin-bottom: 20px;
-            font-size: 1em;
-            width: 100%;
-            cursor: pointer;
+            border: 1px solid #ddd;
+            border-radius: 4px;
         }
 
         button {
-            background-color: #2a9d8f;
-            color: #fff;
+            background-color: #00796b;
+            color: #ffffff;
             border: none;
-            padding: 12px 20px;
-            font-size: 1em;
-            border-radius: 5px;
+            padding: 10px 20px;
+            border-radius: 4px;
             cursor: pointer;
-            width: 100%;
-            transition: background-color 0.3s;
+            font-size: 16px;
         }
 
         button:hover {
-            background-color: #21867a;
+            background-color: #00574b;
         }
 
         .result {
-            font-size: 1.1em;
-            margin: 20px 0;
-            color: #264653;
-            background: #e9f5f4;
-            padding: 15px;
-            border-radius: 8px;
-            border: 1px solid #2a9d8f;
-            display: inline-block;
-            text-align: left;
-            width: 100%;
+            margin-top: 30px;
         }
 
-        img {
-            max-width: 100%; 
-            height: auto; 
-            margin-top: 10px;
+        .result-box {
+            border: 1px solid #00796b;
+            padding: 15px;
+            border-radius: 6px;
+            background-color: #e8f5e9;
+            text-align: left;
+        }
+
+        .recommendations {
+            margin-top: 20px;
+            text-align: left;
+        }
+
+        ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        ul li {
+            background-color: #c8e6c9;
+            margin: 5px 0;
+            padding: 10px;
+            border-radius: 4px;
         }
     </style>
 </head>
 <body>
-    <!-- Input Section -->
     <div class="container">
         <h1>Prediksi Jenis Tanah</h1>
-        <h2>Unggah Gambar Tanah Anda</h2>
-        <form action="/predict" method="post" enctype="multipart/form-data" id="uploadForm">
-            <label for="file">Pilih gambar:</label>
-            <input type="file" name="file" id="file" required>
-            <button type="submit" id="submitButton">Prediksi</button>
-        </form>
-    </div>
+        <p>Unggah gambar tanah untuk mengetahui jenis tanah dan rekomendasi tanaman.</p>
+        <input type="file" id="fileInput" accept="image/*">
+        <br>
+        <button id="predictButton">Prediksi</button>
 
-    <!-- Output Section -->
-    <div class="container" id="result-section" style="display: none;">
-        <h1>Hasil Prediksi</h1>
-        <div class="result">
-            <p><strong>Jenis Tanah:</strong> <span id="predictedClass"></span></p>
-            <p><strong>Probabilitas:</strong> <span id="probability"></span>%</p>
+        <!-- Kontainer hasil -->
+        <div id="resultContainer" class="result" style="display: none;">
+            <h2>Hasil Prediksi</h2>
+            <div class="result-box">
+                <p><strong>Jenis Tanah:</strong> <span id="predictedClass">-</span></p>
+                <p><strong>Probabilitas:</strong> <span id="probability">-</span>%</p>
+            </div>
+
+            <div class="recommendations">
+                <h3>Rekomendasi Tanaman</h3>
+                <ul id="recommendationList"></ul>
+            </div>
         </div>
-        <img id="uploadedImage" src="#" alt="Gambar Tanah">
-        <button onclick="scrollToTop()">Kembali ke atas</button>
     </div>
 
     <script>
-        const fileInput = document.getElementById('file');
-        const resultSection = document.getElementById('result-section');
-        const predictedClassSpan = document.getElementById('predictedClass');
-        const probabilitySpan = document.getElementById('probability');
-        const uploadedImage = document.getElementById('uploadedImage');
+        const fileInput = document.getElementById("fileInput");
+        const predictButton = document.getElementById("predictButton");
+        const resultContainer = document.getElementById("resultContainer");
+        const predictedClassSpan = document.getElementById("predictedClass");
+        const probabilitySpan = document.getElementById("probability");
+        const recommendationList = document.getElementById("recommendationList");
 
-        function scrollToTop() {
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-
-        // Simulate prediction result
-        document.getElementById('uploadForm').addEventListener('submit', async function (event) {
-            event.preventDefault();
-
-           const formData = new FormData();
+        predictButton.addEventListener("click", () => {
             const file = fileInput.files[0];
-            formData.append('file', file);
+            if (!file) {
+                alert("Silakan pilih file gambar terlebih dahulu.");
+                return;
+            }
 
-             try {
-                 const response = await fetch('/predict', {
-                     method: 'POST',
-                     body: formData,
-                 });
+            const formData = new FormData();
+            formData.append("file", file);
 
-                 if (!response.ok) {
-                     throw new Error('Gagal memproses prediksi.');
-                 }
+            fetch("http://localhost:5000/predict", {
+                method: "POST",
+                body: formData
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        alert(data.error);
+                        return;
+                    }
 
-                 const data = await response.json();
-                 if (data.error) {
-                     alert(data.error);
-                 } else {
-                     resultSection.style.display = 'block';
-                     predictedClassSpan.textContent = data.predicted_class;
-                     probabilitySpan.textContent = `${data.probability}%`;
+                    // Tampilkan hasil prediksi
+                    predictedClassSpan.textContent = data.predicted_class;
+                    probabilitySpan.textContent = data.probability;
 
-                     // Display uploaded image
-                     const reader = new FileReader();
-                     reader.onload = function (e) {
-                         uploadedImage.src = e.target.result;
-                     };
-                     reader.readAsDataURL(file);
-                }
-             } catch (error) {
-                 console.error(error);
-                 alert('Terjadi kesalahan saat memproses prediksi.');
-             }
+                    // Tampilkan rekomendasi tanaman
+                    recommendationList.innerHTML = ""; // Hapus rekomendasi lama
+                    data.recommendations.forEach(plant => {
+                        const listItem = document.createElement("li");
+                        listItem.textContent = plant;
+                        recommendationList.appendChild(listItem);
+                    });
+
+                    // Tampilkan kontainer hasil
+                    resultContainer.style.display = "block";
+                })
+                .catch(error => console.error("Error:", error));
         });
     </script>
 </body>
