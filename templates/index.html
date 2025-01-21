@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prediksi Jenis Tanah</title>
+    {% comment %} <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}"> {% endcomment %}
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f7fa;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* Container Styles */
+        .container {
+            background: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+            padding: 30px;
+            max-width: 500px;
+            width: 90%;
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        /* Header Styles */
+        h1 {
+            font-size: 2.2em;
+            color: #2a9d8f;
+            margin-bottom: 10px;
+        }
+
+        h2 {
+            font-size: 1.3em;
+            color: #264653;
+            margin-bottom: 20px;
+        }
+
+        /* Form Styles */
+        form {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        label {
+            font-size: 1em;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        input[type="file"] {
+            border: 1px solid #ccc;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            font-size: 1em;
+            width: 100%;
+            cursor: pointer;
+        }
+
+        button {
+            background-color: #2a9d8f;
+            color: #fff;
+            border: none;
+            padding: 12px 20px;
+            font-size: 1em;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100%;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #21867a;
+        }
+
+        /* Result Section Styles */
+        .result {
+            font-size: 1.5em;
+            margin: 20px 0;
+            color: #264653;
+            background: #e9f5f4;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #2a9d8f;
+            display: inline-block;
+        }
+
+        /* Scroll Button Styles */
+        button {
+            transition: background-color 0.3s, transform 0.2s;
+        }
+
+        button:hover {
+            transform: scale(1.05);
+        }
+
+        img {
+            max-width: 70%; 
+            height: auto; 
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Home Section -->
+    <div class="container">
+        <h1>Prediksi Jenis Tanah</h1>
+        <h2>Unggah Gambar Tanah Anda</h2>
+        <form action="/submit" method="post" enctype="multipart/form-data" id="uploadForm">
+            <label for="file">Pilih gambar:</label>
+            <input type="file" name="image" id="file" required>
+            <div id="previewArea">
+                <p id="message">Belum ada file</p>
+            </div>
+            <button type="submit" id="submitButton">Prediksi</button>
+        </form>
+    </div>
+
+    <!-- Result Section -->
+    <div class="container" id="result-section">
+        <h1>Hasil Prediksi</h1>
+        {% if prediction %}
+        <p>Gambar yang Anda unggah telah berhasil diprediksi.</p>
+        <img src="{{ url_for('static', filename=img_path.split('/')[-1]) }}" alt="">
+        <p class="result">Hasil: <span>{{ prediction }}</span></p>
+        {% endif %}
+        <button onclick="scrollToTop()">Kembali ke atas</button>
+    </div>
+
+    <script>
+        const fileInput = document.getElementById('file');
+        const previewArea = document.getElementById('previewArea');
+        const submitButton = document.getElementById('submitButton');
+        const message = document.getElementById('message');
+        const allowedTypes = ['image/png', 'image/jpeg', 'image/jpg'];
+
+        fileInput.addEventListener("change", (event) => {
+            const file = event.target.files[0];
+
+            if (file) {
+                if (!allowedTypes.includes(file.type)) {
+                    message.textContent = "Format file tidak didukung. Gunakan PNG atau JPEG.";
+                    submitButton.disabled = true;
+                } else {
+                    message.textContent = `File terpilih: ${file.name}`;
+                    submitButton.disabled = false;
+                }
+            } else {
+                message.textContent = "Belum ada file";
+                submitButton.disabled = true;
+            }
+        });
+
+        function scrollToTop() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    </script>
+</body>
+</html>
