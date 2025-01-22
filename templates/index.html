@@ -81,9 +81,11 @@
     <div class="container">
         <h1>Prediksi Jenis Tanah</h1>
         <p>Unggah gambar tanah untuk mengetahui jenis tanah dan rekomendasi tanaman.</p>
-        <input type="file" id="fileInput" accept="image/*">
-        <br>
-        <button id="predictButton">Prediksi</button>
+        <form action="/predict" method="post" enctype="multipart/form-data" id="uploadForm">
+            <input type="file" id="fileInput" accept="image/*">
+            <br>
+            <button id="predictButton">Prediksi</button>
+        </form>
 
         <!-- Kontainer hasil -->
         <div id="resultContainer" class="result" style="display: none;">
@@ -97,6 +99,8 @@
                 <h3>Rekomendasi Tanaman</h3>
                 <ul id="recommendationList"></ul>
             </div>
+            <img id="uploadedImage" src="#" alt="Gambar Tanah">
+            <button onclick="scrollToTop()">Kembali ke atas</button>
         </div>
     </div>
 
