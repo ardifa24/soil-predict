@@ -107,6 +107,8 @@
                 <ul id="recommendationList"></ul>
             </div>
             <img id="uploadedImage" src="#" alt="Gambar Tanah">
+            <br>
+            <button type="button" id="resetButton">Reset</button>
         </div>
     </div>
 
@@ -118,6 +120,7 @@
         const probabilitySpan = document.getElementById("probability");
         const recommendationList = document.getElementById("recommendationList");
         const uploadedImage = document.getElementById("uploadedImage");
+        const resetButton = document.getElementById("resetButton");
 
         predictButton.addEventListener("click", () => {
             const file = fileInput.files[0];
@@ -163,6 +166,22 @@
                     resultContainer.style.display = "block";
                 })
                 .catch(error => console.error("Error:", error));
+        });
+
+        resetButton.addEventListener("click", () => {
+            // Reset formulir
+            fileInput.value = "";
+            resultContainer.style.display = "none"; // Sembunyikan kontainer hasil
+            predictedClassSpan.textContent = "-";
+            probabilitySpan.textContent = "-";
+            recommendationList.innerHTML = ""; // Kosongkan daftar rekomendasi
+            uploadedImage.src = "#"; // Reset gambar unggah
+
+            // Scroll kembali ke atas
+            window.scrollTo({
+                top: 0,
+                behavior: "smooth"
+            });
         });
     </script>
 </body>
